@@ -51,5 +51,6 @@ void	my_put_uns_int(unsigned int u);
 void	my_put_uns_long(unsigned long u);
 void	my_put_uns_pointer(unsigned long u);
 void	my_put_bin(unsigned long u);
+int	my_printf(const char *format, ...);
 
 #endif /*! MY_H_ */

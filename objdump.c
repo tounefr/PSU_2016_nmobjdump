@@ -18,25 +18,27 @@ char handle_static_library(t_elf_file *file) {
     return 0;
 }
 
-char            objdump(char *file_path) {
+char            objdump(char *bin_path, char *file_path) {
     t_elf_file  file;
     void        *data;
 
     init_elf_file(&file);
     file.file_path = file_path;
-    if (-1 == (file.fd = open(file_path, O_RDONLY)))
-        return error(NULL, file_path, 0);
-    if (-1 == fstat(file.fd, &file.file_infos))
-        return error(NULL, file_path, 0);
+    file.bin_path = bin_path;
+    if (-1 == (file.fd = open(file_path, O_RDONLY)) ||
+        -1 == fstat(file.fd, &file.file_infos))
+        MY_ERROR(0, "%s: '%s': No such file\n", bin_path, file_path);
+    if (!S_ISREG(file.file_infos.st_mode))
+        MY_ERROR(0, "%s: Warning: '%s' is not an ordinary file\n", bin_path, file_path);
     file.mapped_mem = mmap(NULL, file.file_infos.st_size,
                            PROT_READ, MAP_SHARED, file.fd, 0);
     if (file.mapped_mem == MAP_FAILED)
-        return error("file.mapped_mem == MAP_FAILED", NULL, 0);
+        STRERRNO(0);
     if (!(handle_static_library(&file) || handle_elf_file(&file)))
         return 0;
     close(file.fd);
     if (-1 == munmap(file.mapped_mem, file.file_infos.st_size))
-        return error(NULL, file_path, 0);
+        STRERRNO(0);
     return 1;
 }
 
@@ -46,10 +48,10 @@ int         main(int argc, char **argv) {
 
     i = 1;
     if (argc == 1)
-        return !objdump("a.out");
+        return !objdump(argv[0], "a.out");
     returnv = 0;
     while (i < argc) {
-        if (!objdump(argv[i++]))
+        if (!objdump(argv[0], argv[i++]))
             returnv = 1;
     }
     return returnv;

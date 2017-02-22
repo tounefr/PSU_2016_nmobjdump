@@ -6,6 +6,10 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <elf.h>
+#include <stdio.h>
+
+#define MY_ERROR(v_, f_, ...) { fprintf(stderr, (f_), __VA_ARGS__); return v_; }
+#define STRERRNO(v_) { fprintf(stderr, "%s\n", strerror(errno)); return v_; }
 
 typedef struct s_common_elf {
     unsigned char e_indent[EI_NIDENT];
@@ -20,6 +24,7 @@ typedef struct s_elf_file {
     Elf64_Shdr *elf_sections;
     Elf64_Shdr *elf_str_section;
 
+    char *bin_path;
     struct stat file_infos;
     void *mapped_mem;
     char *file_path;
@@ -72,17 +77,13 @@ char handle_elf_file(t_elf_file *file);
 
 char is_printable(char cur_char);
 
-char error(char *str, char *filepath, int returnv);
+char fill_elf_header(t_elf_file *file);
 
-void fill_elf_header(t_elf_file *file);
-
-void fill_elf_program_header(t_elf_file *file);
+char fill_elf_program_header(t_elf_file *file);
 
 void fill_elf_section_header(Elf64_Shdr *dest, Elf32_Shdr *src);
 
 char fill_elf_sections(t_elf_file *file);
-
-char malloc_error();
 
 char *printf_format_offset(Elf64_Shdr *section_hdr);
 
