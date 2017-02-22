@@ -108,4 +108,6 @@ char *my_revstr(char *str);
 
 char *my_strcat(char *str1, char *str2);
 
+char handle_static_library(t_elf_file *file);
+
 #endif //PSU_2016_NMOBJDUMP_OBJDUMP_H

@@ -76,14 +76,14 @@ char                handle_elf_file(t_elf_file *file) {
         MY_ERROR(0, "%s: %s: File format not recognized\n", file->file_path, file->bin_path);
     file->is_32bits = (common_elf->e_indent[EI_CLASS] == ELFCLASS32);
     if (!fill_elf_header(file))
-        MY_ERROR(0, "%s: %s: File truncated\n", file->file_path, file->bin_path);
+        MY_ERROR(0, "%s: %s: File truncated\n", file->bin_path, file->file_path);
     if (file->elf_header->e_shoff <= 0 ||
         file->elf_header->e_shnum <= 0)
         return 0;
     if (file->elf_header->e_phoff <= 0 && file->elf_header->e_type != ET_REL)
         return 0;
     if (!fill_elf_program_header(file) || !fill_elf_sections(file))
-        MY_ERROR(0, "%s: %s: File truncated\n", file->file_path, file->bin_path);
+        MY_ERROR(0, "%s: %s: File truncated\n", file->bin_path, file->file_path);
     if (!set_string_section(file))
         MY_ERROR(0, "%s: warning: %s has a corrupt string table index - ignoring\n",
                  file->file_path, file->bin_path);
