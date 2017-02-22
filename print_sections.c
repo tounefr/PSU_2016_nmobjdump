@@ -10,11 +10,12 @@ void            print_section_hexadecimal(
     char        cur_char;
     Elf64_Off   off;
     int         i;
-
+    char        *format_printf;
     i = 0;
     off = section_hdr->sh_addr + *offset;
 
-    printf(" %04x ", off);
+    format_printf = printf_format_offset(section_hdr);
+    printf(format_printf, off);
     while (i < 16) {
         if ((i + *offset) < section_hdr->sh_size) {
             cur_char = ((char *) section_content)[*offset + i];

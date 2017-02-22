@@ -53,14 +53,17 @@ char *str_concat(char *str1, char *str2) {
 
 char    *printf_format_offset(Elf64_Shdr *section_hdr) {
     int last_nbr;
+    int last_nbr_save;
     int nbr_rangs;
 
     last_nbr = section_hdr->sh_addr + section_hdr->sh_size;
     nbr_rangs = 0;
+    last_nbr_save = last_nbr;
     while (last_nbr > 0) {
-        last_nbr /= my_pow(16, nbr_rangs++);
+        last_nbr /= my_pow(16, nbr_rangs);
+        nbr_rangs++;
     }
     nbr_rangs++;
-
-    return str_concat(str_concat(" %0", my_int_to_str(nbr_rangs)), "x");
+    //printf("nbr_rangs = %d last_nbr=%d ", nbr_rangs, last_nbr_save);
+    return str_concat(str_concat(" %0", my_int_to_str(nbr_rangs)), "x ");
 }
