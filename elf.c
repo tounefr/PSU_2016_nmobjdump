@@ -48,6 +48,16 @@ void        set_flags(t_elf_file *file) {
     }
 }
 
+char set_string_section(t_elf_file *file) {
+    if (file->elf_header->e_shstrndx > file->elf_header->e_shnum || file->elf_header->e_shstrndx < 0)
+        return 0;
+    if (file->elf_sections[file->elf_header->e_shstrndx].sh_type != SHT_STRTAB)
+        return 0;
+    file->section_strings = file->mapped_mem +
+                            file->elf_sections[file->elf_header->e_shstrndx].sh_offset;
+    return 1;
+}
+
 char                handle_elf_file(t_elf_file *file) {
     t_common_elf    *common_elf;
     Elf64_Ehdr      *elf_64bits;
@@ -74,8 +84,9 @@ char                handle_elf_file(t_elf_file *file) {
         return 0;
     if (!fill_elf_program_header(file) || !fill_elf_sections(file))
         MY_ERROR(0, "%s: %s: File truncated\n", file->file_path, file->bin_path);
-    file->section_strings = file->mapped_mem +
-                            file->elf_sections[file->elf_header->e_shstrndx].sh_offset;
+    if (!set_string_section(file))
+        MY_ERROR(0, "%s: warning: %s has a corrupt string table index - ignoring\n",
+                 file->file_path, file->bin_path);
     set_flags(file);
     print_header(file);
     print_sections(file);
