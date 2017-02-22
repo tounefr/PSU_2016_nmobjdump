@@ -1,23 +1,21 @@
 
 #include <stdlib.h>
-#include "objdump.h"
+#include "common.h"
 
-void fill_elf_header(t_elf_file *file) {
-    Elf32_Ehdr *elf_32bits;
-    int i;
+void            fill_elf_header(t_elf_file *file) {
+    Elf32_Ehdr  *elf_32bits;
+    int         i;
 
     if (!file->is_32bits) {
         file->elf_header = (Elf64_Ehdr *) file->mapped_mem;
         return;
     }
     elf_32bits = (Elf32_Ehdr *) file->mapped_mem;
-    if (NULL == (file->elf_header = malloc(sizeof(Elf64_Ehdr)))) {
-        error("malloc error", 0);
-        exit(1);
-    }
+    if (NULL == (file->elf_header = malloc(sizeof(Elf64_Ehdr))))
+        malloc_error();
     i = 0;
-    while (i < EI_NIDENT)
-        file->elf_header->e_ident[i] = elf_32bits->e_ident[i++];
+    while (i++ < EI_NIDENT)
+        file->elf_header->e_ident[i - 1] = elf_32bits->e_ident[i - 1];
     file->elf_header->e_type = elf_32bits->e_type;
     file->elf_header->e_machine = elf_32bits->e_machine;
     file->elf_header->e_version = elf_32bits->e_version;
@@ -33,12 +31,13 @@ void fill_elf_header(t_elf_file *file) {
     file->elf_header->e_shstrndx = elf_32bits->e_shstrndx;
 }
 
-void fill_elf_program_header(t_elf_file *file) {
-    Elf32_Ehdr *elf_32bits;
-    Elf32_Phdr *elf_program_header_32bits;
+void            fill_elf_program_header(t_elf_file *file) {
+    Elf32_Ehdr  *elf_32bits;
+    Elf32_Phdr  *elf_program_header_32bits;
 
     if (!file->is_32bits) {
-        file->elf_program_header = (Elf64_Phdr * )(file->mapped_mem + file->elf_header->e_phoff);
+        file->elf_program_header = (file->mapped_mem +
+                file->elf_header->e_phoff);
         return;
     }
     elf_32bits = (Elf32_Ehdr *) file->mapped_mem;
@@ -46,11 +45,9 @@ void fill_elf_program_header(t_elf_file *file) {
         file->elf_program_header = NULL;
         return;
     }
-    if (NULL == (file->elf_program_header = malloc(sizeof(Elf64_Phdr)))) {
-        error("malloc error", 1);
-        exit(1);
-    }
-    elf_program_header_32bits = (Elf32_Phdr *) file->mapped_mem + elf_32bits->e_phoff;
+    if (NULL == (file->elf_program_header = malloc(sizeof(Elf64_Phdr))))
+        malloc_error();
+    elf_program_header_32bits = file->mapped_mem + elf_32bits->e_phoff;
     file->elf_program_header->p_type = elf_program_header_32bits->p_type;
     file->elf_program_header->p_flags = elf_program_header_32bits->p_flags;
     file->elf_program_header->p_offset = elf_program_header_32bits->p_offset;
@@ -74,25 +71,27 @@ void fill_elf_section_header(Elf64_Shdr *dest, Elf32_Shdr *src) {
     dest->sh_entsize = src->sh_entsize;
 }
 
-void fill_elf_sections(t_elf_file *file) {
-    int i;
-    Elf32_Shdr *sections_32bits;
+void                fill_elf_sections(t_elf_file *file) {
+    int             i;
+    unsigned int    size;
+    Elf32_Shdr      *sections_32bits;
 
     if (!file->is_32bits) {
-        file->elf_sections = (Elf64_Shdr * )(file->mapped_mem + file->elf_header->e_shoff);
-        file->section_strings = file->mapped_mem + file->elf_sections[file->elf_header->e_shstrndx].sh_offset;
+        file->elf_sections = (file->mapped_mem + file->elf_header->e_shoff);
+        file->section_strings = file->mapped_mem +
+                file->elf_sections[file->elf_header->e_shstrndx].sh_offset;
         return;
     }
-    file->elf_sections = malloc(sizeof(Elf64_Shdr) * file->elf_header->e_shnum);
-    if (file->elf_sections == NULL) {
-        error("malloc error\n", 0);
-        exit(1);
-    }
-    sections_32bits = (Elf32_Shdr * )(file->mapped_mem + file->elf_header->e_shoff);
+    size = sizeof(Elf64_Shdr) * file->elf_header->e_shnum;
+    file->elf_sections = malloc(size);
+    if (file->elf_sections == NULL)
+        malloc_error();
+    sections_32bits = (file->mapped_mem + file->elf_header->e_shoff);
     i = 0;
     while (i < file->elf_header->e_shnum) {
         fill_elf_section_header(&file->elf_sections[i], &sections_32bits[i]);
         i++;
     }
-    file->section_strings = file->mapped_mem + file->elf_sections[file->elf_header->e_shstrndx].sh_offset;
+    file->section_strings = file->mapped_mem +
+            file->elf_sections[file->elf_header->e_shstrndx].sh_offset;
 }

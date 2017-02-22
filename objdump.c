@@ -9,15 +9,7 @@
 #include <sys/mman.h>
 #include "common.h"
 
-void    display_symbols(t_elf_file *file) {
-    int i;
-
-    i = 0;
-    //SHT_SYMTAB SHT_HASH
-    while (i < file->elf_header->)
-}
-
-char            nm(char *file_path) {
+char            objdump(char *file_path) {
     t_elf_file  file;
     void        *data;
 
@@ -33,10 +25,15 @@ char            nm(char *file_path) {
         return error(strerror(errno), 0);
     if (!pre_check_elf_header(&file))
         return error("Not an ELF file", 0);
-
-    display_symbols(&file);
-
+    print_header(&file);
+    print_sections(&file);
     close(file.fd);
+    /*if (file.is_32bits) {
+        if (file.elf_program_header)
+            free(file.elf_program_header);
+        if (file.elf_sections)
+            free(file.elf_sections);
+    }*/
     if (-1 == munmap(file.mapped_mem, file.file_infos.st_size))
         return error(strerror(errno), 0);
 }
@@ -46,5 +43,5 @@ int         main(int argc, char **argv) {
 
     i = 1;
     while (i < argc)
-        nm(argv[i++]);
+        objdump(argv[i++]);
 }

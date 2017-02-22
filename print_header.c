@@ -1,10 +1,10 @@
 
 #include <stdio.h>
-#include "objdump.h"
+#include "common.h"
 
-void print_flags(t_elf_file *file) {
-    int i;
-    int c;
+void        print_flags(t_elf_file *file) {
+    int     i;
+    int     c;
 
     i = 0;
     c = 0;
@@ -19,9 +19,9 @@ void print_flags(t_elf_file *file) {
     printf("\n");
 }
 
-int cpt_flags(t_elf_file *file) {
-    int i;
-    int result;
+int         cpt_flags(t_elf_file *file) {
+    int     i;
+    int     result;
 
     result = 0;
     i = 0;
@@ -33,24 +33,22 @@ int cpt_flags(t_elf_file *file) {
     return result;
 }
 
-void print_header(t_elf_file *file) {
-    char *file_format;
-    char *architecture;
-    int flags_result;
+void        print_header(t_elf_file *file) {
+    char    *file_format;
+    char    *architecture;
+    int     flags_result;
 
-    file_format = (file->elf_header->e_ident[EI_CLASS] == ELFCLASS32) ? "" : "elf64-x86-64";
-    architecture = "UNKNOWN!";
-    if (file->elf_header->e_machine == EM_386)
-        architecture = "i386";
-    if (file->elf_header->e_machine == EM_X86_64)
-        architecture = "i386:x86-64";
-    //if (file->elf_header->e_machine == EM_NONE)
+    file_format = (file->is_32bits)
+                  ? "elf32-i386" : "elf64-x86-64";
+    architecture = (file->elf_header->e_machine == EM_386) ? "i386" :
+                   (file->elf_header->e_machine == EM_X86_64) ?
+                   "i386:x86-64" : "UNKNOWN!";
     printf("\n%s:     file format %s\n", file->file_path, file_format);
     flags_result = cpt_flags(file);
     printf("architecture: %s, flags 0x%08x:\n", architecture, flags_result);
     print_flags(file);
-    if (file->elf_header->e_ident[EI_CLASS] == ELFCLASS32)
-        printf("start address %#08lx\n\n", file->elf_header->e_entry);
+    if (file->is_32bits)
+        printf("start address 0x%08x\n\n", file->elf_header->e_entry);
     else
-        printf("start address %#018lx\n\n", file->elf_header->e_entry);
+        printf("start address 0x%016x\n\n", file->elf_header->e_entry);
 }
