@@ -8,9 +8,10 @@
 ** Last update Wed Jun 01 11:40:05 2016 thomas
 */
 
-#include "my.h"
+#include <stdlib.h>
+#include "common.h"
 
-char	*remove_useless_zero(char *str)
+static char	*remove_useless_zero(char *str)
 {
   int	i;
   char	*str_cleaned;
@@ -21,7 +22,7 @@ char	*remove_useless_zero(char *str)
   return (&str[i]);
 }
 
-long long	my_long_power_rec(long long nb, int power)
+static long long	my_long_power_rec(long long nb, int power)
 {
   if (power == 0)
     return (1);

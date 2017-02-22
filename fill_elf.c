@@ -8,13 +8,13 @@ char            fill_elf_header(t_elf_file *file) {
 
     if (!file->is_32bits) {
         file->elf_header = (Elf64_Ehdr *) file->mapped_mem;
-        return !(file->elf_header >= (file->mapped_mem + file->file_infos.st_size - sizeof(Elf64_Ehdr)));
+        return !((void*)file->elf_header >= (file->mapped_mem + file->file_infos.st_size - sizeof(Elf64_Ehdr)));
     }
     elf_32bits = (Elf32_Ehdr *) file->mapped_mem;
     if (NULL == (file->elf_header = malloc(sizeof(Elf64_Ehdr))))
         return 0;
     i = 0;
-    if (file->elf_header >= (file->mapped_mem + file->file_infos.st_size - sizeof(Elf32_Ehdr)))
+    if ((void*)file->elf_header >= (file->mapped_mem + file->file_infos.st_size - sizeof(Elf32_Ehdr)))
         return 0;
     while (i++ < EI_NIDENT)
         file->elf_header->e_ident[i - 1] = elf_32bits->e_ident[i - 1];
@@ -40,13 +40,13 @@ char            fill_elf_program_header(t_elf_file *file) {
 
     if (!file->is_32bits) {
         file->elf_program_header = (file->mapped_mem + file->elf_header->e_phoff);
-        return !(file->elf_program_header >= (file->mapped_mem + file->file_infos.st_size - sizeof(Elf64_Phdr)));
+        return !((void*)file->elf_program_header >= (file->mapped_mem + file->file_infos.st_size - sizeof(Elf64_Phdr)));
     }
     elf_32bits = (Elf32_Ehdr *) file->mapped_mem;
     if (NULL == (file->elf_program_header = malloc(sizeof(Elf64_Phdr))))
         return 0;
     elf_program_header_32bits = file->mapped_mem + elf_32bits->e_phoff;
-    if (elf_program_header_32bits >= (file->mapped_mem + file->file_infos.st_size - sizeof(Elf32_Phdr)))
+    if ((void*)elf_program_header_32bits >= (file->mapped_mem + file->file_infos.st_size - sizeof(Elf32_Phdr)))
         return 0;
     file->elf_program_header->p_type = elf_program_header_32bits->p_type;
     file->elf_program_header->p_flags = elf_program_header_32bits->p_flags;
@@ -79,13 +79,13 @@ char                fill_elf_sections(t_elf_file *file) {
 
     if (!file->is_32bits) {
         file->elf_sections = (file->mapped_mem + file->elf_header->e_shoff);
-        return !(file->elf_sections >= (file->mapped_mem + file->file_infos.st_size - (file->elf_header->e_phnum * sizeof(Elf64_Shdr))));
+        return !((void*)file->elf_sections >= (file->mapped_mem + file->file_infos.st_size - (file->elf_header->e_phnum * sizeof(Elf64_Shdr))));
     }
     size = sizeof(Elf64_Shdr) * file->elf_header->e_shnum;
     if (NULL == (file->elf_sections = malloc(size)))
         return 0;
     sections_32bits = (file->mapped_mem + file->elf_header->e_shoff);
-    if (sections_32bits >= (file->mapped_mem + file->file_infos.st_size - (file->elf_header->e_phnum * sizeof(Elf32_Shdr))))
+    if ((void*)sections_32bits >= (file->mapped_mem + file->file_infos.st_size - (file->elf_header->e_phnum * sizeof(Elf32_Shdr))))
         return 0;
     i = 0;
     while (i < file->elf_header->e_shnum) {

@@ -10,6 +10,7 @@
 
 #define MY_ERROR(v_, f_, ...) { fprintf(stderr, (f_), __VA_ARGS__); return v_; }
 #define STRERRNO(v_) { fprintf(stderr, "%s\n", strerror(errno)); return v_; }
+#define AR_MAGIC_NBR "!<arch>"
 
 typedef struct s_common_elf {
     unsigned char e_indent[EI_NIDENT];
@@ -33,6 +34,16 @@ typedef struct s_elf_file {
     void *section_strings;
     int flags;
 } t_elf_file;
+
+typedef struct __attribute__((packed)) s_static_file_header {
+    char file_name[16];
+    char edit_timestamp[12];
+    char owner_id[6];
+    char group_id[6];
+    char file_mode[8];
+    char file_size[10];
+    char end_chars[2];
+} t_static_file_header;
 
 #define N_FLAGS 10
 enum e_flags {
@@ -90,5 +101,11 @@ char *printf_format_offset(Elf64_Shdr *section_hdr);
 char *str_concat(char *str1, char *str2);
 
 void init_elf_file(t_elf_file *file);
+
+char *my_int_to_str(int nbr);
+
+char *my_revstr(char *str);
+
+char *my_strcat(char *str1, char *str2);
 
 #endif //PSU_2016_NMOBJDUMP_OBJDUMP_H

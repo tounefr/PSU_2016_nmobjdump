@@ -8,7 +8,9 @@
 ** Last update Wed Jan  6 10:55:59 2016 thomas
 */
 
-#include "stdlib.h"
+#include <string.h>
+#include <stdlib.h>
+#include "common.h"
 
 char    *my_strcat(char *str1, char *str2)
 {
@@ -16,7 +18,7 @@ char    *my_strcat(char *str1, char *str2)
   int   i2;
   char  *str3;
 
-  if (0 == (str3 = malloc(my_strlen(str1) + my_strlen(str2) + 1)))
+  if (0 == (str3 = malloc(strlen(str1) + strlen(str2) + 1)))
     return (NULL);
   i = 0;
   i2 = 0;

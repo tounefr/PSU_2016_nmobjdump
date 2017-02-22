@@ -6,7 +6,10 @@ NM_SRCS =   nm.c \
             util.c \
             print_header.c \
             print_sections.c \
-            elf.c
+            elf.c \
+            my_revstr.c \
+            my_strcat.c \
+            my_int_to_str.c
 
 NM_OBJS = $(NM_SRCS:.c=.o)
 
@@ -17,30 +20,29 @@ OBJDUMP_SRCS =  objdump.c \
                 util.c \
                 print_header.c \
                 print_sections.c \
-                elf.c
+                elf.c \
+                my_revstr.c \
+                my_strcat.c \
+                my_int_to_str.c
 
 OBJDUMP_OBJS = $(OBJDUMP_SRCS:.c=.o)
 
-CFLAGS+= -I ./my -L ./my -lmy -g
+CFLAGS+= -g
 
 all: nm objdump
 
 nm:
-	make -C ./my
 	$(CC) -o $(NM_BIN) $(NM_SRCS)  $(CFLAGS)
 
 objdump:
-	make -C ./my
 	$(CC) -o $(OBJDUMP_BIN) $(OBJDUMP_SRCS) $(CFLAGS)
 
 re: fclean all
 
 clean:
-	make -C ./my clean
 	$(RM) $(OBJDUMP_OBJS)
 	$(RM) $(NM_OBJS)
 
 fclean: clean
-	make -C ./my fclean
 	$(RM) $(NM_BIN)
 	$(RM) $(OBJDUMP_BIN)
