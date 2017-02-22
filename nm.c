@@ -14,7 +14,7 @@ void    display_symbols(t_elf_file *file) {
 
     i = 0;
     //SHT_SYMTAB SHT_HASH
-    while (i < file->elf_header->)
+   // while (i < file->elf_header->)
 }
 
 char            nm(char *file_path) {
