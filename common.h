@@ -68,11 +68,11 @@ void print_section(t_elf_file *file, Elf64_Shdr *section_hdr);
 
 void print_sections(t_elf_file *file);
 
-char pre_check_elf_header(t_elf_file *file);
+char handle_elf_file(t_elf_file *file);
 
 char is_printable(char cur_char);
 
-char error(char *str, int returnv);
+char error(char *str, char *filepath, int returnv);
 
 void fill_elf_header(t_elf_file *file);
 
@@ -80,12 +80,14 @@ void fill_elf_program_header(t_elf_file *file);
 
 void fill_elf_section_header(Elf64_Shdr *dest, Elf32_Shdr *src);
 
-void fill_elf_sections(t_elf_file *file);
+char fill_elf_sections(t_elf_file *file);
 
 char malloc_error();
 
 char *printf_format_offset(Elf64_Shdr *section_hdr);
 
 char *str_concat(char *str1, char *str2);
+
+void init_elf_file(t_elf_file *file);
 
 #endif //PSU_2016_NMOBJDUMP_OBJDUMP_H

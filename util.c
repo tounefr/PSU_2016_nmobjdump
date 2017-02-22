@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
+#include <errno.h>
 #include "common.h"
 #include "my.h"
 
@@ -10,13 +11,17 @@ char is_printable(char cur_char) {
     return (cur_char >= 32 && cur_char <= 126);
 }
 
-char error(char *str, int returnv) {
+char error(char *str, char *filepath, int returnv) {
+    if (errno != 0 && str == NULL) {
+        fprintf(stderr, "objdump: '%s': %s\n", filepath, strerror(errno));
+        return returnv;
+    }
     fprintf(stderr, "%s\n", str);
     return returnv;
 }
 
 char malloc_error() {
-    error("malloc error", 0);
+    error("malloc error", NULL, 0);
     exit(1);
 }
 

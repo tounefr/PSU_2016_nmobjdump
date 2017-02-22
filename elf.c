@@ -37,6 +37,7 @@ void        set_flags(t_elf_file *file) {
                 file->elf_sections[i].sh_type == SHT_SYMTAB ||
                 file->elf_sections[i].sh_type == SHT_HASH)
             file->flags |= HAS_SYSMS;
+        //TODO: fix that shit
         if (!strcmp(section_name, ".line") &&
                 file->elf_sections[i].sh_type == SHT_PROGBITS)
             file->flags |= HAS_LINENO;
@@ -47,7 +48,7 @@ void        set_flags(t_elf_file *file) {
     }
 }
 
-char                pre_check_elf_header(t_elf_file *file) {
+char                handle_elf_file(t_elf_file *file) {
     t_common_elf    *common_elf;
     Elf64_Ehdr      *elf_64bits;
 
@@ -63,15 +64,17 @@ char                pre_check_elf_header(t_elf_file *file) {
           common_elf->e_indent[EI_VERSION] != EV_NONE
         ))
         return 0;
-    file->is_32bits = 0;
-    if (common_elf->e_indent[EI_CLASS] == ELFCLASS32)
-        file->is_32bits = 1;
+    file->is_32bits = (common_elf->e_indent[EI_CLASS] == ELFCLASS32);
     fill_elf_header(file);
-    if (file->elf_header->e_phoff == 0 || file->elf_header->e_shoff == 0 || file->elf_header->e_shnum == 0)
+    if (file->elf_header->e_phoff == 0 || file->elf_header->e_shoff == 0 ||
+            file->elf_header->e_shnum == 0)
         return 0;
     fill_elf_program_header(file);
-    fill_elf_sections(file);
+    if (!fill_elf_sections(file))
+        return 0;
     set_flags(file);
+    print_header(file);
+    print_sections(file);
     return 1;
 }
 

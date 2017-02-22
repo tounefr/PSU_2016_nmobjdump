@@ -21,7 +21,7 @@ OBJDUMP_SRCS =  objdump.c \
 
 OBJDUMP_OBJS = $(OBJDUMP_SRCS:.c=.o)
 
-CFLAGS+= -I ./my -L ./my -lmy
+CFLAGS+= -I ./my -L ./my -lmy -g
 
 all: nm objdump
 

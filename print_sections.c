@@ -74,7 +74,7 @@ void                print_section(t_elf_file *file, Elf64_Shdr *section_hdr) {
     if (!check_print_section(file, section_hdr))
         return;
     section_content = file->mapped_mem + section_hdr->sh_offset;
-    printf("Contents of section %s %d:\n", section_name, section_hdr->sh_addr);
+    printf("Contents of section %s %ld:\n", section_name, section_hdr->sh_addr);
     offset = 0;
     while (offset < section_hdr->sh_size) {
         print_section_hexadecimal(section_content, &offset, section_hdr);

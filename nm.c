@@ -9,6 +9,7 @@
 #include <sys/mman.h>
 #include "common.h"
 
+/*
 void    display_symbols(t_elf_file *file) {
     int i;
 
@@ -47,4 +48,8 @@ int         main(int argc, char **argv) {
     i = 1;
     while (i < argc)
         nm(argv[i++]);
+}*/
+
+int main() {
+
 }

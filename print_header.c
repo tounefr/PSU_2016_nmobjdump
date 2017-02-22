@@ -48,7 +48,7 @@ void        print_header(t_elf_file *file) {
     printf("architecture: %s, flags 0x%08x:\n", architecture, flags_result);
     print_flags(file);
     if (file->is_32bits)
-        printf("start address 0x%08x\n\n", file->elf_header->e_entry);
+        printf("start address 0x%08lx\n\n", file->elf_header->e_entry);
     else
-        printf("start address 0x%016x\n\n", file->elf_header->e_entry);
+        printf("start address 0x%016lx\n\n", file->elf_header->e_entry);
 }

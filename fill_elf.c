@@ -71,16 +71,18 @@ void fill_elf_section_header(Elf64_Shdr *dest, Elf32_Shdr *src) {
     dest->sh_entsize = src->sh_entsize;
 }
 
-void                fill_elf_sections(t_elf_file *file) {
+char                fill_elf_sections(t_elf_file *file) {
     int             i;
     unsigned int    size;
     Elf32_Shdr      *sections_32bits;
 
     if (!file->is_32bits) {
         file->elf_sections = (file->mapped_mem + file->elf_header->e_shoff);
+        /*if ((file->file_infos.st_size - sizeof(Elf64_Ehdr)) < (sizeof(Elf64_Shdr) * file->elf_header->e_shnum))
+            return 0;*/
         file->section_strings = file->mapped_mem +
                 file->elf_sections[file->elf_header->e_shstrndx].sh_offset;
-        return;
+        return 1;
     }
     size = sizeof(Elf64_Shdr) * file->elf_header->e_shnum;
     file->elf_sections = malloc(size);
@@ -94,4 +96,5 @@ void                fill_elf_sections(t_elf_file *file) {
     }
     file->section_strings = file->mapped_mem +
             file->elf_sections[file->elf_header->e_shstrndx].sh_offset;
+    return 1;
 }

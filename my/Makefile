@@ -49,9 +49,7 @@ SRCS	=	my_putchar.c		\
 		my_put_unbr.c		\
 		my_put_unbr_base.c      \
 		my_strdup.c		\
-		my_int_to_str.c		\
-		my_printf.c		\
-		my_printf_special.c
+		my_int_to_str.c
 
 OBJS	= $(SRCS:.c=.o)
 
