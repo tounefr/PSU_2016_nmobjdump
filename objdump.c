@@ -26,7 +26,12 @@ char            objdump(char *bin_path, char *file_path) {
                            PROT_READ, MAP_SHARED, file.fd, 0);
     if (file.mapped_mem == MAP_FAILED)
         STRERRNO(0);
-    if (!(handle_static_library(&file) || handle_elf_file(&file)))
+    file.end = ((char*)file.mapped_mem + file.file_infos.st_size - 1);
+    if (handle_static_library(&file)) {}
+    else if (handle_elf_file(&file)) {
+        print_header(&file);
+        print_sections(&file);
+    } else
         return 0;
     close(file.fd);
     if (-1 == munmap(file.mapped_mem, file.file_infos.st_size))

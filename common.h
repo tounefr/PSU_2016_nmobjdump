@@ -28,6 +28,7 @@ typedef struct s_elf_file {
     char *bin_path;
     struct stat file_infos;
     void *mapped_mem;
+    void *end;
     char *file_path;
     int fd;
     char is_32bits;
@@ -109,5 +110,9 @@ char *my_revstr(char *str);
 char *my_strcat(char *str1, char *str2);
 
 char handle_static_library(t_elf_file *file);
+
+char fill_symtabs(Elf64_Sym **sym_tabs64, Elf32_Sym *sym_tabs32, int nbr_symtabs);
+
+char *lookup_string_section(t_elf_file *file, unsigned int offset);
 
 #endif //PSU_2016_NMOBJDUMP_OBJDUMP_H
