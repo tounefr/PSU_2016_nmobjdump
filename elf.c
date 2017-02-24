@@ -76,7 +76,7 @@ char                handle_elf_file(t_elf_file *file) {
     Elf64_Ehdr      *elf_64bits;
 
     if (file->file_infos.st_size < sizeof(t_common_elf))
-        MY_ERROR(0, "%s: %s: File format not recognized\n", file->file_path, file->bin_path);
+        MY_ERROR(0, "%s: %s: File format not recognized\n", file->bin_path, file->file_path);
     common_elf = (t_common_elf *) file->mapped_mem;
     if (!(common_elf->e_indent[EI_MAG0] == ELFMAG0 &&
           common_elf->e_indent[EI_MAG1] == ELFMAG1 &&
@@ -86,10 +86,10 @@ char                handle_elf_file(t_elf_file *file) {
           common_elf->e_indent[EI_DATA] != ELFDATANONE &&
           common_elf->e_indent[EI_VERSION] != EV_NONE
         ))
-        MY_ERROR(0, "%s: %s: File format not recognized\n", file->file_path, file->bin_path);
+        MY_ERROR(0, "%s: %s: File format not recognized\n", file->bin_path, file->file_path);
     file->is_32bits = (common_elf->e_indent[EI_CLASS] == ELFCLASS32);
     if (!get_elf_header(file) || !get_program_header(file))
-        MY_ERROR(0, "%s: %s: File truncated\n", file->file_path, file->bin_path);
+        MY_ERROR(0, "%s: %s: File truncated\n", file->bin_path, file->file_path);
     set_flags(file);
     return 1;
 }

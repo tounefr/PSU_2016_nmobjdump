@@ -51,6 +51,7 @@ char            objdump(char *bin_path, char *file_path) {
 
 int         main(int argc, char **argv) {
     int i;
+    int i2;
     int returnv;
 
     i = 1;
@@ -58,6 +59,7 @@ int         main(int argc, char **argv) {
         return !objdump(argv[0], "a.out");
     returnv = 0;
     while (i < argc) {
+        i2 = 0;
         if (!objdump(argv[0], argv[i++]))
             returnv = 1;
     }
