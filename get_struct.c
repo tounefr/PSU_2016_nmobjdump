@@ -63,7 +63,8 @@ char sections_hdr_to_64bits(t_elf_file *file) {
         return 1;
     }
     elf_sections = file->mapped_mem + elf_header->e_shoff;
-    if (NULL == (file->elf_sections = malloc(sizeof(Elf64_Shdr) * elf_header->e_shnum)))
+    if (NULL == (file->elf_sections = malloc(sizeof(Elf64_Shdr) *
+                                                     elf_header->e_shnum)))
         return 0;
     fill_elf_sections(file->elf_sections, elf_sections, elf_header->e_shnum);
     return 1;

@@ -45,7 +45,9 @@ char    cross_sym_section(t_elf_file *file,
     while (i < nbr_symtabs) {
         sym_type = ELF32_ST_TYPE(sym_tabs64[i].st_info);
         if (sym_tabs64[i].st_name != 0) {
-            name = (char*)(file->mapped_mem + file->elf_sections[section_hdr->sh_link].sh_offset + sym_tabs64[i].st_name);
+            name = (char*)(file->mapped_mem +
+                    file->elf_sections[section_hdr->sh_link].sh_offset +
+                    sym_tabs64[i].st_name);
             if (sym_tabs64[i].st_value == 0)
                 printf("     ");
             else
@@ -66,9 +68,10 @@ char            print_sections_symbols(t_elf_file *file) {
     nbr_symtabs = 0;
     while (i < file->elf_header->e_shnum) {
         if (file->elf_sections[i].sh_type == SHT_SYMTAB ||
-            file->elf_sections[i].sh_type == SHT_HASH
-                ) {
-            nbr_symtabs = file->elf_sections[i].sh_size / file->elf_sections[i].sh_entsize;
+            file->elf_sections[i].sh_type == SHT_HASH)
+        {
+            nbr_symtabs = file->elf_sections[i].sh_size /
+                    file->elf_sections[i].sh_entsize;
             sym_tabs = file->mapped_mem + file->elf_sections[i].sh_offset;
             cross_sym_section(file, &file->elf_sections[i], sym_tabs, nbr_symtabs);
         }
@@ -87,7 +90,8 @@ char            nm(char *bin_path, char *file_path) {
         -1 == fstat(file.fd, &file.file_infos))
         MY_ERROR(0, "%s: '%s': No such file\n", bin_path, file_path);
     if (!S_ISREG(file.file_infos.st_mode))
-        MY_ERROR(0, "%s: Warning: '%s' is not an ordinary file\n", bin_path, file_path);
+        MY_ERROR(0, "%s: Warning: '%s' is not an ordinary file\n",
+                 bin_path, file_path);
     file.mapped_mem = mmap(NULL, file.file_infos.st_size,
                            PROT_READ, MAP_SHARED, file.fd, 0);
     if (file.mapped_mem == MAP_FAILED)
