@@ -18,7 +18,8 @@ COMMON_SRCS = fill_elf.c \
               my_revstr.c \
               my_strcat.c \
               my_int_to_str.c \
-              static_lib.c
+              static_lib.c \
+              get_struct.c
 
 NM_SRCS =   nm.c $(COMMON_SRCS)
 

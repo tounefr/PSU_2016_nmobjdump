@@ -55,12 +55,14 @@ void        print_section_printable(void *section_content,
     }
 }
 
-
 char    check_print_section(t_elf_file *file, Elf64_Shdr *section_hdr) {
     char *section_name;
+    Elf64_Shdr *section_str;
 
-    section_name = (char *) (file->section_strings + section_hdr->sh_name);
-    if (file->elf_str_section == section_hdr ||
+    if (NULL == (section_name = lookup_string(file, section_hdr->sh_name)))
+        return 0;
+    section_str = get_section_header(file, file->elf_header->e_shstrndx);
+    if (section_str == section_hdr ||
         section_hdr->sh_type == SHT_NOBITS ||
         section_hdr->sh_type == SHT_NULL ||
         section_hdr->sh_size == 0)
@@ -79,7 +81,8 @@ void                print_section(t_elf_file *file, Elf64_Shdr *section_hdr) {
     void            *section_content;
     unsigned int    offset;
 
-    section_name = (char *) (file->section_strings + section_hdr->sh_name);
+    if (NULL == (section_name = lookup_string(file, section_hdr->sh_name)))
+        return;
     if (!check_print_section(file, section_hdr))
         return;
     section_content = file->mapped_mem + section_hdr->sh_offset;
@@ -95,14 +98,31 @@ void                print_section(t_elf_file *file, Elf64_Shdr *section_hdr) {
 
 void    print_sections(t_elf_file *file) {
     int i;
+    char            *section_name;
+    void            *section_content;
+    unsigned int    offset;
+    Elf64_Shdr *section_hdr;
 
     if (file->elf_header->e_shoff == 0 || file->elf_header->e_shnum == 0)
         return;
-    fill_elf_sections(file);
-    file->elf_str_section = &file->elf_sections[file->elf_header->e_shstrndx];
-    file->section_strings = file->mapped_mem +
-            file->elf_str_section->sh_offset;
     i = 0;
-    while (i < file->elf_header->e_shnum)
-        print_section(file, &file->elf_sections[i++]);
+    while (i < file->elf_header->e_shnum) {
+        if (NULL == (section_hdr = get_section_header(file, i)))
+            return;
+        if (NULL == (section_name = lookup_string(file, section_hdr->sh_name)))
+            return;
+        if (check_print_section(file, section_hdr)) {
+            if ((section_content = get_section_content(file, i))) {
+                printf("Contents of section %s:\n", section_name);
+                offset = 0;
+                while (offset < section_hdr->sh_size) {
+                    print_section_hexadecimal(section_content, &offset, section_hdr);
+                    print_section_printable(section_content, &offset, section_hdr);
+                    printf("\n");
+                    offset += 16;
+                }
+            }
+        }
+        i++;
+    }
 }

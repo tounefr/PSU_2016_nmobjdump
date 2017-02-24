@@ -43,7 +43,7 @@ char        set_flags(t_elf_file *file) {
     while (i < file->elf_header->e_shnum) {
         if (NULL == (section_hdr = get_sectionhdr(file, i)))
             return 0;
-        section_name = (char*)(file->section_strings + section_hdr->sh_name);
+        section_name = "";
         if (section_hdr->sh_type == SHT_DYNAMIC)
             file->flags |= D_PAGED;
         if (section_hdr->sh_type == SHT_DYNSYM ||
@@ -71,18 +71,6 @@ Elf64_Shdr *get_sectionhdr(t_elf_file *file, unsigned int i) {
     return offset;
 }
 
-char set_string_section(t_elf_file *file) {
-    Elf64_Shdr *section;
-
-    if (file->elf_header->e_shstrndx > file->elf_header->e_shnum || file->elf_header->e_shstrndx <= 0)
-        return 0;
-    section = get_sectionhdr(file, file->elf_header->e_shstrndx);
-    if (!section || section->sh_type != SHT_STRTAB)
-        return 0;
-    file->section_strings = file->mapped_mem + section->sh_offset;
-    return 1;
-}
-
 char                handle_elf_file(t_elf_file *file) {
     t_common_elf    *common_elf;
     Elf64_Ehdr      *elf_64bits;
@@ -100,14 +88,8 @@ char                handle_elf_file(t_elf_file *file) {
         ))
         MY_ERROR(0, "%s: %s: File format not recognized\n", file->file_path, file->bin_path);
     file->is_32bits = (common_elf->e_indent[EI_CLASS] == ELFCLASS32);
-    if (!fill_elf_header(file) ||
-        (file->elf_header->e_shoff <= 0 || file->elf_header->e_shnum <= 0) ||
-        (file->elf_header->e_phoff <= 0 && file->elf_header->e_type != ET_REL) ||
-        (!fill_elf_program_header(file) || !fill_elf_sections(file)))
-        MY_ERROR(0, "%s: %s: File truncated\n", file->bin_path, file->file_path);
-    if (!set_string_section(file))
-        MY_ERROR(0, "%s: warning: %s has a corrupt string table index - ignoring\n",
-                 file->file_path, file->bin_path);
+    if (!get_elf_header(file) || !get_program_header(file))
+        MY_ERROR(0, "%s: %s: File truncated\n", file->file_path, file->bin_path);
     set_flags(file);
     return 1;
 }
@@ -116,15 +98,5 @@ void init_elf_file(t_elf_file *file) {
     file->elf_header = NULL;
     file->elf_program_header = NULL;
     file->elf_sections = NULL;
-    file->elf_str_section = NULL;
     file->mapped_mem = NULL;
-    file->section_strings = NULL;
-}
-
-char *lookup_string_section(t_elf_file *file, unsigned int offset) {
-    if (file->section_strings == NULL)
-        return NULL;
-    if (file->section_strings + offset > file->end)
-        return NULL;
-    return (char*)(file->section_strings + offset);
 }

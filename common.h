@@ -32,7 +32,6 @@ typedef struct s_elf_file {
     Elf64_Ehdr *elf_header;
     Elf64_Phdr *elf_program_header;
     Elf64_Shdr *elf_sections;
-    Elf64_Shdr *elf_str_section;
 
     char *bin_path;
     struct stat file_infos;
@@ -41,7 +40,6 @@ typedef struct s_elf_file {
     char *file_path;
     int fd;
     char is_32bits;
-    void *section_strings;
     int flags;
 } t_elf_file;
 
@@ -98,14 +96,6 @@ char handle_elf_file(t_elf_file *file);
 
 char is_printable(char cur_char);
 
-char fill_elf_header(t_elf_file *file);
-
-char fill_elf_program_header(t_elf_file *file);
-
-void fill_elf_section_header(Elf64_Shdr *dest, Elf32_Shdr *src);
-
-char fill_elf_sections(t_elf_file *file);
-
 char *printf_format_offset(Elf64_Shdr *section_hdr);
 
 char *str_concat(char *str1, char *str2);
@@ -120,10 +110,24 @@ char *my_strcat(char *str1, char *str2);
 
 char handle_static_library(t_elf_file *file);
 
-char fill_symtabs(Elf64_Sym **sym_tabs64, Elf32_Sym *sym_tabs32, int nbr_symtabs);
-
-char *lookup_string_section(t_elf_file *file, unsigned int offset);
-
 Elf64_Shdr *get_sectionhdr(t_elf_file *file, unsigned int i);
+
+Elf64_Ehdr *get_elf_header(t_elf_file *file);
+
+Elf64_Phdr *get_program_header(t_elf_file *file);
+
+Elf64_Shdr *get_section_header(t_elf_file *file, unsigned int i);
+
+void *get_section_content(t_elf_file *file, unsigned int i);
+
+void fill_elf_header(Elf64_Ehdr *dest, Elf32_Ehdr *src);
+
+void fill_elf_program_header(Elf64_Phdr *dest, Elf32_Phdr *src);
+
+void fill_elf_section_header(Elf64_Shdr *dest, Elf32_Shdr *src);
+
+void fill_elf_sections(Elf64_Shdr *dest, Elf32_Shdr *src, unsigned nbr);
+
+char *lookup_string(t_elf_file *file, unsigned int i);
 
 #endif //PSU_2016_NMOBJDUMP_OBJDUMP_H

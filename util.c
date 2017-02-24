@@ -15,7 +15,6 @@
 #include <errno.h>
 #include <stdarg.h>
 #include "common.h"
-#include "my.h"
 
 char is_printable(char cur_char) {
     return (cur_char >= 32 && cur_char <= 126);
