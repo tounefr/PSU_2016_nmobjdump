@@ -1,3 +1,12 @@
+/*
+** common.h for  in /home/thomas/Documents/epitech/PSU_2016_nmobjdump
+** 
+** Made by thomas
+** Login   <thomas@epitech.net>
+** 
+** Started on  Fri Feb 24 15:46:07 2017 thomas
+** Last update Fri Feb 24 15:46:08 2017 thomas
+*/
 
 #ifndef PSU_2016_NMOBJDUMP_OBJDUMP_H
 #define PSU_2016_NMOBJDUMP_OBJDUMP_H
