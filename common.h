@@ -115,4 +115,6 @@ char fill_symtabs(Elf64_Sym **sym_tabs64, Elf32_Sym *sym_tabs32, int nbr_symtabs
 
 char *lookup_string_section(t_elf_file *file, unsigned int offset);
 
+Elf64_Shdr *get_sectionhdr(t_elf_file *file, unsigned int i);
+
 #endif //PSU_2016_NMOBJDUMP_OBJDUMP_H

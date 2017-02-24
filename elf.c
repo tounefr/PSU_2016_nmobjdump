@@ -1,5 +1,6 @@
 
 #include <string.h>
+#include <assert.h>
 #include "common.h"
 
 struct s_flags g_flags[N_FLAGS] = {
@@ -15,9 +16,10 @@ struct s_flags g_flags[N_FLAGS] = {
         {D_PAGED,      "D_PAGED"}
 };
 
-void        set_flags(t_elf_file *file) {
+char        set_flags(t_elf_file *file) {
     int     i;
     char    *section_name;
+    Elf64_Shdr *section_hdr;
 
     file->flags = 0;
     if (file->elf_header->e_type == ET_REL)
@@ -30,31 +32,45 @@ void        set_flags(t_elf_file *file) {
         file->flags |= HAS_DEBUG;
     i = 0;
     while (i < file->elf_header->e_shnum) {
-        section_name = (char*)(file->section_strings + file->elf_sections[i].sh_name);
-        if (file->elf_sections[i].sh_type == SHT_DYNAMIC)
+        if (NULL == (section_hdr = get_sectionhdr(file, i)))
+            return 0;
+        section_name = (char*)(file->section_strings + section_hdr->sh_name);
+        if (section_hdr->sh_type == SHT_DYNAMIC)
             file->flags |= D_PAGED;
-        if (file->elf_sections[i].sh_type == SHT_DYNSYM ||
-                file->elf_sections[i].sh_type == SHT_SYMTAB ||
-                file->elf_sections[i].sh_type == SHT_HASH)
+        if (section_hdr->sh_type == SHT_DYNSYM ||
+                section_hdr->sh_type == SHT_SYMTAB ||
+                section_hdr->sh_type == SHT_HASH)
             file->flags |= HAS_SYSMS;
         //TODO: fix that shit
         if (!strcmp(section_name, ".line") &&
-                file->elf_sections[i].sh_type == SHT_PROGBITS)
+                section_hdr->sh_type == SHT_PROGBITS)
             file->flags |= HAS_LINENO;
         if (!strcmp(section_name, ".debug") &&
-                file->elf_sections[i].sh_type == SHT_PROGBITS)
+                section_hdr->sh_type == SHT_PROGBITS)
             file->flags |= HAS_DEBUG;
         i++;
     }
+    return 1;
+}
+
+Elf64_Shdr *get_sectionhdr(t_elf_file *file, unsigned int i) {
+    Elf64_Shdr *offset;
+
+    offset = file->mapped_mem + file->elf_header->e_shoff + (sizeof(Elf64_Shdr) * i);
+    if ((void*)offset >= file->end - sizeof(Elf64_Shdr))
+        return NULL;
+    return offset;
 }
 
 char set_string_section(t_elf_file *file) {
-    if (file->elf_header->e_shstrndx > file->elf_header->e_shnum || file->elf_header->e_shstrndx < 0)
+    Elf64_Shdr *section;
+
+    if (file->elf_header->e_shstrndx > file->elf_header->e_shnum || file->elf_header->e_shstrndx <= 0)
         return 0;
-    if (file->elf_sections[file->elf_header->e_shstrndx].sh_type != SHT_STRTAB)
+    section = get_sectionhdr(file, file->elf_header->e_shstrndx);
+    if (!section || section->sh_type != SHT_STRTAB)
         return 0;
-    file->section_strings = file->mapped_mem +
-                            file->elf_sections[file->elf_header->e_shstrndx].sh_offset;
+    file->section_strings = file->mapped_mem + section->sh_offset;
     return 1;
 }
 
@@ -97,5 +113,9 @@ void init_elf_file(t_elf_file *file) {
 }
 
 char *lookup_string_section(t_elf_file *file, unsigned int offset) {
+    if (file->section_strings == NULL)
+        return NULL;
+    if (file->section_strings + offset > file->end)
+        return NULL;
     return (char*)(file->section_strings + offset);
 }

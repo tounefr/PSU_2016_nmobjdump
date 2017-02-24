@@ -24,6 +24,7 @@ char    cross_sym_section(t_elf_file *file,
     Elf64_Sym *sym_tabs64;
     int i;
     char *name;
+    int sym_type;
 
     sym_tabs64 = sym_tabs;
     if (file->is_32bits) {
@@ -32,23 +33,11 @@ char    cross_sym_section(t_elf_file *file,
     }
     i = 0;
     while (i < nbr_symtabs) {
-        /*
-        printf("[SYMTAB %d]\n", i);
-        printf("st_name=%d\n", sym_tabs64[i].st_name);
-        if (sym_tabs64[i].st_name != 0) {
-           printf("NAME : %s\n", (char*)(file->mapped_mem + file->elf_sections[section_hdr->sh_link].sh_offset + sym_tabs64[i].st_name));
-        }
-        printf("st_info=%d\n", sym_tabs64[i].st_info);
-        printf("st_other=%d\n", sym_tabs64[i].st_other);
-        printf("st_shndw=%d\n", sym_tabs64[i].st_shndx);
-        printf("st_value=%d\n", sym_tabs64[i].st_value);
-        printf("st_size=%d\n", sym_tabs64[i].st_size);
-        printf("\n");
-        */
+        sym_type = ELF32_ST_TYPE(sym_tabs64[i].st_info);
         if (sym_tabs64[i].st_name != 0) {
             name = (char*)(file->mapped_mem + file->elf_sections[section_hdr->sh_link].sh_offset + sym_tabs64[i].st_name);
             if (sym_tabs64[i].st_value == 0)
-                printf("%016c ", ' ');
+                printf("     ");
             else
                 printf("%016lx ", sym_tabs64[i].st_value);
             printf("%s \n", name);
@@ -93,7 +82,8 @@ char            nm(char *bin_path, char *file_path) {
                            PROT_READ, MAP_SHARED, file.fd, 0);
     if (file.mapped_mem == MAP_FAILED)
         STRERRNO(0);
-    if (handle_static_library(&file)){}
+    if (handle_static_library(&file))
+        return 0;
     else if (handle_elf_file(&file)) {
         print_sections_symbols(&file);
     } else
