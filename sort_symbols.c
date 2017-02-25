@@ -77,7 +77,6 @@ t_sorted_symbols *sort_symbols(t_elf_file *file,
                                Elf64_Shdr *section_hdr,
                                Elf64_Sym *sym_tabs,
                                int nbr_syms) {
-    int i;
     t_sorted_symbols *sorted_symbols;
     t_sorted_symbols *cur;
     char sorted;

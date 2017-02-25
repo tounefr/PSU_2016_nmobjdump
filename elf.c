@@ -71,7 +71,6 @@ void init_elf_file(t_elf_file *file) {
 
 char                handle_elf_file(t_elf_file *file) {
     t_common_elf    *common_elf;
-    Elf64_Ehdr      *elf_64bits;
 
     if (file->file_infos.st_size < sizeof(t_common_elf))
         MY_ERROR(0, "%s: %s: File format not recognized\n",

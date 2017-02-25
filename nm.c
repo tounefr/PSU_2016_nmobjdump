@@ -37,7 +37,7 @@ char *lookup_string_symbol(t_elf_file *file,
     return file->mapped_mem + str_hdr->sh_offset + sym->st_name;
 }
 
-char print_symbols(t_elf_file *file,
+static void print_symbols(t_elf_file *file,
                    t_sorted_symbols *sorted_symbols,
                    Elf64_Shdr *section_hdr) {
     char *name;
@@ -95,7 +95,6 @@ char            print_sections_symbols(t_elf_file *file) {
 
 char            nm(char *bin_path, char *file_path) {
     t_elf_file  file;
-    void        *data;
 
     init_elf_file(&file);
     file.file_path = file_path;

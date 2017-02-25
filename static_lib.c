@@ -15,17 +15,6 @@ static char is_static_library(t_elf_file *file) {
     return !strncmp((char*)file->mapped_mem, "!<arch>\n", 8);
 }
 
-static void    replace_spaces(void *ptr, int size) {
-    int i;
-
-    i = 0;
-    while (i < size) {
-        if (((char*)ptr)[i] == ' ')
-            ((char*)ptr)[i] = 0;
-        i++;
-    }
-}
-
 static void    init_static_file_header(
         t_static_file_header *static_file_header)
 {

@@ -76,28 +76,8 @@ static char    check_print_section(t_elf_file *file, Elf64_Shdr *section_hdr) {
     return 1;
 }
 
-static void                print_section(t_elf_file *file, Elf64_Shdr *section_hdr) {
-    char            *section_name;
-    void            *section_content;
-    unsigned int    offset;
-
-    if (NULL == (section_name = lookup_string(file, section_hdr->sh_name)))
-        return;
-    if (!check_print_section(file, section_hdr))
-        return;
-    section_content = file->mapped_mem + section_hdr->sh_offset;
-    printf("Contents of section %s:\n", section_name);
-    offset = 0;
-    while (offset < section_hdr->sh_size) {
-        print_section_hexadecimal(section_content, &offset, section_hdr);
-        print_section_printable(section_content, &offset, section_hdr);
-        printf("\n");
-        offset += 16;
-    }
-}
-
-void    print_sections(t_elf_file *file) {
-    int i;
+void                print_sections(t_elf_file *file) {
+    int             i;
     char            *section_name;
     void            *section_content;
     unsigned int    offset;
@@ -116,8 +96,10 @@ void    print_sections(t_elf_file *file) {
                 printf("Contents of section %s:\n", section_name);
                 offset = 0;
                 while (offset < section_hdr->sh_size) {
-                    print_section_hexadecimal(section_content, &offset, section_hdr);
-                    print_section_printable(section_content, &offset, section_hdr);
+                    print_section_hexadecimal(section_content,
+                                              &offset, section_hdr);
+                    print_section_printable(section_content,
+                                            &offset, section_hdr);
                     printf("\n");
                     offset += 16;
                 }
