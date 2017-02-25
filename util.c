@@ -20,7 +20,7 @@ char is_printable(char cur_char) {
     return (cur_char >= 32 && cur_char <= 126);
 }
 
-int	my_pow(int nb, int power)
+long	my_pow(long nb, int power)
 {
     if (power == 0)
         return 1;
@@ -59,11 +59,13 @@ char    *printf_format_offset(Elf64_Shdr *section_hdr) {
     last_nbr = section_hdr->sh_addr + section_hdr->sh_size;
     nbr_rangs = 0;
     last_nbr_save = last_nbr;
-    while (last_nbr > 0) {
-        last_nbr /= my_pow(16, nbr_rangs);
-        nbr_rangs++;
-    }
+
+    nbr_rangs = 10;
+    while (last_nbr / my_pow(16, nbr_rangs) == 0)
+        nbr_rangs--;
     nbr_rangs++;
-    //printf("nbr_rangs = %d last_nbr=%d ", nbr_rangs, last_nbr_save);
+    if (nbr_rangs < 4)
+        nbr_rangs = 4;
+//    printf("nbr_rangs = %d last_nbr=%x ", nbr_rangs, last_nbr_save);
     return str_concat(str_concat(" %0", my_int_to_str(nbr_rangs)), "x ");
 }

@@ -33,7 +33,7 @@ OBJDUMP_BIN = my_objdump
 
 OBJDUMP_SRCS =  objdump.c \
                 $(COMMON_SRCS)
-                
+
 OBJDUMP_OBJS = $(OBJDUMP_SRCS:.c=.o)
 
 CFLAGS+=

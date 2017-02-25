@@ -30,14 +30,14 @@ char            objdump(char *bin_path, char *file_path) {
         -1 == fstat(file.fd, &file.file_infos))
         MY_ERROR(0, "%s: '%s': No such file\n", bin_path, file_path);
     if (!S_ISREG(file.file_infos.st_mode))
-        MY_ERROR(0, "%s: Warning: '%s' is not an ordinary file\n", bin_path, file_path);
+        MY_ERROR(0, "%s: Warning: '%s' is not an ordinary file\n",
+                 bin_path, file_path);
     file.mapped_mem = mmap(NULL, file.file_infos.st_size,
                            PROT_READ, MAP_SHARED, file.fd, 0);
     if (file.mapped_mem == MAP_FAILED)
         STRERRNO(0);
     file.end = ((char*)file.mapped_mem + file.file_infos.st_size - 1);
-    if (handle_static_library(&file)) {}
-    else if (handle_elf_file(&file)) {
+    if (handle_elf_file(&file)) {
         print_header(&file);
         print_sections(&file);
     } else
@@ -49,8 +49,8 @@ char            objdump(char *bin_path, char *file_path) {
 }
 
 int         main(int argc, char **argv) {
-    int i;
-    int returnv;
+    int     i;
+    int     returnv;
 
     i = 1;
     if (argc == 1)
