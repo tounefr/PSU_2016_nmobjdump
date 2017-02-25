@@ -27,22 +27,30 @@ char check_print_symbol(Elf64_Sym *sym) {
     return 1;
 }
 
-char *lookup_string_symbol(t_elf_file *file,
+char            *lookup_string_symbol(t_elf_file *file,
                            Elf64_Shdr *section_hdr,
                            Elf64_Sym *sym) {
-    Elf64_Shdr *str_hdr;
+    Elf64_Shdr  *str_hdr;
 
     if (NULL == (str_hdr = get_section_header(file, section_hdr->sh_link)))
         return NULL;
     return file->mapped_mem + str_hdr->sh_offset + sym->st_name;
 }
 
-static void print_symbols(t_elf_file *file,
+char get_letter(t_elf_file *file,
+                Elf64_Shdr *section_hdr,
+                Elf64_Sym *sym) {
+    if (sym->st_info == STT_NOTYPE)
+        return 'U';
+    return '?';
+}
+
+static void     print_symbols(t_elf_file *file,
                    t_sorted_symbols *sorted_symbols,
                    Elf64_Shdr *section_hdr) {
-    char *name;
-    int sym_type;
-    Elf64_Off offset;
+    char        *name;
+    int         sym_type;
+    Elf64_Off   offset;
 
     while (sorted_symbols) {
         sym_type = ELF32_ST_TYPE(sorted_symbols->symbol->st_info);
@@ -53,23 +61,26 @@ static void print_symbols(t_elf_file *file,
                         offset +
                         sorted_symbols->symbol->st_name);
                 if (sorted_symbols->symbol->st_value == 0)
-                    printf("%17c", ' ');
+                    printf((file->is_32bits) ? "%9c" : "%17c", ' ');
                 else
-                    printf("%016lx ", sorted_symbols->symbol->st_value);
-                printf("%s\n", name);
+                    printf((file->is_32bits) ? "%08lx " : "%016lx ",
+                           sorted_symbols->symbol->st_value);
+                printf("%c %s\n",
+                       get_letter(file, section_hdr, sorted_symbols->symbol),
+                       name);
             }
         }
         sorted_symbols = sorted_symbols->next;
     }
 }
 
-char            print_sections_symbols(t_elf_file *file) {
-    int         i;
-    int         nbr_symbols;
-    Elf64_Sym        *sym_tabs;
-    void        *sym_section;
-    Elf64_Shdr  *section_hdr;
-    t_sorted_symbols *sorted_symbols;
+static char             print_sections_symbols(t_elf_file *file) {
+    int                 i;
+    int                 nbr_symbols;
+    Elf64_Sym           *sym_tabs;
+    void                *sym_section;
+    Elf64_Shdr          *section_hdr;
+    t_sorted_symbols    *sorted_symbols;
 
     i = 1;
     nbr_symbols = 0;
@@ -84,7 +95,6 @@ char            print_sections_symbols(t_elf_file *file) {
             sorted_symbols = sort_symbols(file, section_hdr,
                                           sym_tabs, nbr_symbols);
             print_symbols(file, sorted_symbols, section_hdr);
-            // print_symbols(file, section_hdr, sym_tabs, nbr_symbols);
         }
         i++;
     }
@@ -122,8 +132,8 @@ char            nm(char *bin_path, char *file_path) {
 }
 
 int         main(int argc, char **argv) {
-    int i;
-    int returnv;
+    int     i;
+    int     returnv;
 
     i = 1;
     if (argc == 1)
