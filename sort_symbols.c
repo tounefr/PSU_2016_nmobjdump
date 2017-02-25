@@ -30,26 +30,6 @@ char symbols_list_push(t_sorted_symbols **head, Elf64_Sym *elem) {
     return 1;
 }
 
-char symbols_list_count(t_sorted_symbols *head) {
-    int i;
-
-    i = 0;
-    while (head) {
-        i++;
-        head = head->next;
-    }
-    return i;
-}
-
-char symbols_list_exists(t_sorted_symbols *head, Elf64_Sym *elem) {
-    while (head) {
-        if (head->symbol == elem)
-            return 1;
-        head = head->next;
-    }
-    return 0;
-}
-
 char symbols_list_push_syms(t_sorted_symbols **sorted_symbols,
                           Elf64_Sym *sym_tabs,
                           int nbr_syms) {
@@ -62,15 +42,6 @@ char symbols_list_push_syms(t_sorted_symbols **sorted_symbols,
         i++;
     }
     return 1;
-}
-
-void debug_symbols(t_elf_file *file,
-                   Elf64_Shdr *section_hdr,
-                   t_sorted_symbols *list) {
-    while (list) {
-        printf("%s\n", lookup_string_symbol(file, section_hdr, list->symbol));
-        list = list->next;
-    }
 }
 
 t_sorted_symbols *sort_symbols(t_elf_file *file,

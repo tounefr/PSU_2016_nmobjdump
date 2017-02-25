@@ -134,4 +134,6 @@ t_sorted_symbols *sort_symbols(t_elf_file *file,
                                Elf64_Sym *sym_tabs,
                                int nbr_syms);
 
+char             print_sections_symbols(t_elf_file *file);
+
 #endif //PSU_2016_NMOBJDUMP_OBJDUMP_H

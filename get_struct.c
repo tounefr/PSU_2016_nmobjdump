@@ -98,25 +98,3 @@ Elf64_Sym *get_symbols(t_elf_file *file,
     fill_symtabs(symtabs_64, symtabs_32, *nbr_symbols);
     return symtabs_64;
 }
-
-void *get_section_content(t_elf_file *file, unsigned int i) {
-    Elf64_Shdr *section_hdr;
-
-    if (NULL == (section_hdr = get_section_header(file, i)))
-        return NULL;
-    /*if (file->mapped_mem + section_hdr->sh_offset + section_hdr->sh_size >
-            file->file_infos.st_size)
-        return NULL;*/
-    return file->mapped_mem + section_hdr->sh_offset;
-}
-
-char *lookup_string(t_elf_file *file, unsigned int i) {
-    Elf64_Shdr *section_hdr;
-
-    section_hdr = get_section_header(file, file->elf_header->e_shstrndx);
-    if (NULL == section_hdr)
-        return NULL;
-    if (section_hdr->sh_type != SHT_STRTAB)
-        return NULL;
-    return (char*)(file->mapped_mem + section_hdr->sh_offset + i);
-}

@@ -12,25 +12,28 @@ NM_BIN = my_nm
 
 COMMON_SRCS = fill_elf.c \
               util.c \
-              print_header.c \
-              print_sections.c \
               elf.c \
               my_revstr.c \
               my_strcat.c \
               my_int_to_str.c \
               static_lib.c \
-              get_struct.c
+              get_struct.c \
+              get_struct2.c \
+              print_header.c \
+              print_sections.c \
+              nm_print.c \
+              sort_symbols.c
 
 NM_SRCS =   nm.c \
-            sort_symbols.c \
             $(COMMON_SRCS)
 
 NM_OBJS = $(NM_SRCS:.c=.o)
 
 OBJDUMP_BIN = my_objdump
 
-OBJDUMP_SRCS = objdump.c $(COMMON_SRCS)
-
+OBJDUMP_SRCS =  objdump.c \
+                $(COMMON_SRCS)
+                
 OBJDUMP_OBJS = $(OBJDUMP_SRCS:.c=.o)
 
 CFLAGS+=
