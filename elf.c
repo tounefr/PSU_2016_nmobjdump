@@ -25,7 +25,7 @@ struct s_flags g_flags[N_FLAGS] = {
         {D_PAGED,      "D_PAGED"}
 };
 
-char        set_flags(t_elf_file *file) {
+static char        set_flags(t_elf_file *file) {
     int     i;
     char    *section_name;
     Elf64_Shdr *section_hdr;
@@ -41,7 +41,7 @@ char        set_flags(t_elf_file *file) {
         file->flags |= HAS_DEBUG;
     i = 0;
     while (i < file->elf_header->e_shnum) {
-        if (NULL == (section_hdr = get_sectionhdr(file, i)))
+        if (NULL == (section_hdr = get_section_header(file, i)))
             return 0;
         section_name = "";
         if (section_hdr->sh_type == SHT_DYNAMIC)
@@ -62,13 +62,11 @@ char        set_flags(t_elf_file *file) {
     return 1;
 }
 
-Elf64_Shdr *get_sectionhdr(t_elf_file *file, unsigned int i) {
-    Elf64_Shdr *offset;
-
-    offset = file->mapped_mem + file->elf_header->e_shoff + (sizeof(Elf64_Shdr) * i);
-    if ((void*)offset >= file->end - sizeof(Elf64_Shdr))
-        return NULL;
-    return offset;
+void init_elf_file(t_elf_file *file) {
+    file->elf_header = NULL;
+    file->elf_program_header = NULL;
+    file->elf_sections = NULL;
+    file->mapped_mem = NULL;
 }
 
 char                handle_elf_file(t_elf_file *file) {
@@ -92,11 +90,4 @@ char                handle_elf_file(t_elf_file *file) {
         MY_ERROR(0, "%s: %s: File truncated\n", file->bin_path, file->file_path);
     set_flags(file);
     return 1;
-}
-
-void init_elf_file(t_elf_file *file) {
-    file->elf_header = NULL;
-    file->elf_program_header = NULL;
-    file->elf_sections = NULL;
-    file->mapped_mem = NULL;
 }

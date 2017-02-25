@@ -72,23 +72,14 @@ struct s_flags {
     char *v;
 };
 
+typedef struct s_sorted_symbols {
+    Elf64_Sym *symbol;
+    struct s_sorted_symbols *next;
+} t_sorted_symbols;
+
 extern struct s_flags g_flags[N_FLAGS];
 
-void print_flags(t_elf_file *file);
-
-int cpt_flags(t_elf_file *file);
-
 void print_header(t_elf_file *file);
-
-void print_section_hexadecimal(void *section_content,
-                               unsigned int *offset,
-                               Elf64_Shdr *section_hdr);
-
-void print_section_printable(void *section_content,
-                             unsigned int *offset,
-                             Elf64_Shdr *section_hdr);
-
-void print_section(t_elf_file *file, Elf64_Shdr *section_hdr);
 
 void print_sections(t_elf_file *file);
 
@@ -129,5 +120,20 @@ void fill_elf_section_header(Elf64_Shdr *dest, Elf32_Shdr *src);
 void fill_elf_sections(Elf64_Shdr *dest, Elf32_Shdr *src, unsigned nbr);
 
 char *lookup_string(t_elf_file *file, unsigned int i);
+
+void fill_symtabs(Elf64_Sym *dest, Elf32_Sym *src, unsigned int nbr);
+
+Elf64_Sym *get_symbols(t_elf_file *file, Elf64_Shdr *section_hdr, int *nbr_symbols);
+
+char print_symbols(t_elf_file *file,
+                   t_sorted_symbols *sorted_symbols,
+                   Elf64_Shdr *section_hdr);
+
+char *lookup_string_symbol(t_elf_file *file, Elf64_Shdr *section_hdr, Elf64_Sym *sym);
+
+t_sorted_symbols *sort_symbols(t_elf_file *file,
+                               Elf64_Shdr *section_hdr,
+                               Elf64_Sym *sym_tabs,
+                               int nbr_syms);
 
 #endif //PSU_2016_NMOBJDUMP_OBJDUMP_H

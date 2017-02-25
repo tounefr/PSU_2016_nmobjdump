@@ -21,7 +21,9 @@ COMMON_SRCS = fill_elf.c \
               static_lib.c \
               get_struct.c
 
-NM_SRCS =   objdump.c $(COMMON_SRCS)
+NM_SRCS =   nm.c \
+            sort_symbols.c \
+            $(COMMON_SRCS)
 
 NM_OBJS = $(NM_SRCS:.c=.o)
 

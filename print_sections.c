@@ -12,7 +12,7 @@
 #include <string.h>
 #include "common.h"
 
-void            print_section_hexadecimal(
+static void            print_section_hexadecimal(
                                 void *section_content,
                                 unsigned int *offset,
                                 Elf64_Shdr *section_hdr) {
@@ -38,7 +38,7 @@ void            print_section_hexadecimal(
     printf(" ");
 }
 
-void        print_section_printable(void *section_content,
+static void        print_section_printable(void *section_content,
                                     unsigned int *offset,
                                     Elf64_Shdr *section_hdr) {
     char    cur_char;
@@ -55,7 +55,7 @@ void        print_section_printable(void *section_content,
     }
 }
 
-char    check_print_section(t_elf_file *file, Elf64_Shdr *section_hdr) {
+static char    check_print_section(t_elf_file *file, Elf64_Shdr *section_hdr) {
     char *section_name;
     Elf64_Shdr *section_str;
 
@@ -76,7 +76,7 @@ char    check_print_section(t_elf_file *file, Elf64_Shdr *section_hdr) {
     return 1;
 }
 
-void                print_section(t_elf_file *file, Elf64_Shdr *section_hdr) {
+static void                print_section(t_elf_file *file, Elf64_Shdr *section_hdr) {
     char            *section_name;
     void            *section_content;
     unsigned int    offset;

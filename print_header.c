@@ -11,7 +11,7 @@
 #include <stdio.h>
 #include "common.h"
 
-void        print_flags(t_elf_file *file) {
+static void        print_flags(t_elf_file *file) {
     int     i;
     int     c;
 
@@ -28,7 +28,7 @@ void        print_flags(t_elf_file *file) {
     printf("\n");
 }
 
-int         cpt_flags(t_elf_file *file) {
+static int         cpt_flags(t_elf_file *file) {
     int     i;
     int     result;
 

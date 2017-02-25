@@ -67,3 +67,18 @@ void fill_elf_sections(Elf64_Shdr *dest, Elf32_Shdr *src, unsigned int nbr) {
         i++;
     }
 }
+
+void fill_symtabs(Elf64_Sym *dest, Elf32_Sym *src, unsigned int nbr) {
+    int i;
+
+    i = 0;
+    while (i < nbr) {
+        dest[i].st_name = src[i].st_name;
+        dest[i].st_info = src[i].st_info;
+        dest[i].st_other = src[i].st_other;
+        dest[i].st_shndx = src[i].st_shndx  ;
+        dest[i].st_value = src[i].st_value;
+        dest[i].st_size = src[i].st_size;
+        i++;
+    }
+}

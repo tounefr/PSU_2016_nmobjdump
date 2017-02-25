@@ -86,6 +86,21 @@ Elf64_Shdr *get_section_header(t_elf_file *file, unsigned int i) {
     return &file->elf_sections[i];
 }
 
+Elf64_Sym *get_symbols(t_elf_file *file, Elf64_Shdr *section_hdr, int *nbr_symbols) {
+    Elf64_Sym *symtabs_64;
+    Elf32_Sym *symtabs_32;
+    int i;
+
+    *nbr_symbols = section_hdr->sh_size / section_hdr->sh_entsize;
+    if (!file->is_32bits)
+        return file->mapped_mem + section_hdr->sh_offset;
+    if (NULL == (symtabs_64 = malloc(*nbr_symbols * sizeof(Elf64_Sym))))
+        return NULL;
+    symtabs_32 = file->mapped_mem + section_hdr->sh_offset;
+    fill_symtabs(symtabs_64, symtabs_32, *nbr_symbols);
+    return symtabs_64;
+}
+
 void *get_section_content(t_elf_file *file, unsigned int i) {
     Elf64_Shdr *section_hdr;
     void *elf_header;
