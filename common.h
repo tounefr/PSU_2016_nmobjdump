@@ -123,13 +123,15 @@ char *lookup_string(t_elf_file *file, unsigned int i);
 
 void fill_symtabs(Elf64_Sym *dest, Elf32_Sym *src, unsigned int nbr);
 
-Elf64_Sym *get_symbols(t_elf_file *file, Elf64_Shdr *section_hdr, int *nbr_symbols);
+Elf64_Sym *get_symbols(t_elf_file *file,
+                       Elf64_Shdr *section_hdr, int *nbr_symbols);
 
 char print_symbols(t_elf_file *file,
                    t_sorted_symbols *sorted_symbols,
                    Elf64_Shdr *section_hdr);
 
-char *lookup_string_symbol(t_elf_file *file, Elf64_Shdr *section_hdr, Elf64_Sym *sym);
+char *lookup_string_symbol(t_elf_file *file,
+                           Elf64_Shdr *section_hdr, Elf64_Sym *sym);
 
 t_sorted_symbols *sort_symbols(t_elf_file *file,
                                Elf64_Shdr *section_hdr,

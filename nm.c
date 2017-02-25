@@ -27,7 +27,9 @@ char check_print_symbol(Elf64_Sym *sym) {
     return 1;
 }
 
-char *lookup_string_symbol(t_elf_file *file, Elf64_Shdr *section_hdr, Elf64_Sym *sym) {
+char *lookup_string_symbol(t_elf_file *file,
+                           Elf64_Shdr *section_hdr,
+                           Elf64_Sym *sym) {
     Elf64_Shdr *str_hdr;
 
     if (NULL == (str_hdr = get_section_header(file, section_hdr->sh_link)))
@@ -40,13 +42,15 @@ char print_symbols(t_elf_file *file,
                    Elf64_Shdr *section_hdr) {
     char *name;
     int sym_type;
+    Elf64_Off offset;
 
     while (sorted_symbols) {
         sym_type = ELF32_ST_TYPE(sorted_symbols->symbol->st_info);
         if (check_print_symbol(sorted_symbols->symbol)) {
             if (sorted_symbols->symbol->st_name != 0) {
+                offset = file->elf_sections[section_hdr->sh_link].sh_offset;
                 name = (char *) (file->mapped_mem +
-                                 file->elf_sections[section_hdr->sh_link].sh_offset +
+                        offset +
                         sorted_symbols->symbol->st_name);
                 if (sorted_symbols->symbol->st_value == 0)
                     printf("%17c", ' ');
@@ -77,7 +81,8 @@ char            print_sections_symbols(t_elf_file *file) {
             nbr_symbols++;
             if (NULL == (sym_tabs = get_symbols(file, section_hdr, &nbr_symbols)))
                 return 0;
-            sorted_symbols = sort_symbols(file, section_hdr, sym_tabs, nbr_symbols);
+            sorted_symbols = sort_symbols(file, section_hdr,
+                                          sym_tabs, nbr_symbols);
             print_symbols(file, sorted_symbols, section_hdr);
             // print_symbols(file, section_hdr, sym_tabs, nbr_symbols);
         }
@@ -99,7 +104,8 @@ char            nm(char *bin_path, char *file_path) {
         -1 == fstat(file.fd, &file.file_infos))
         MY_ERROR(0, "%s: '%s': No such file\n", bin_path, file_path);
     if (!S_ISREG(file.file_infos.st_mode))
-        MY_ERROR(0, "%s: Warning: '%s' is not an ordinary file\n", bin_path, file_path);
+        MY_ERROR(0, "%s: Warning: '%s' is not an ordinary file\n",
+                 bin_path, file_path);
     file.mapped_mem = mmap(NULL, file.file_infos.st_size,
                            PROT_READ, MAP_SHARED, file.fd, 0);
     if (file.mapped_mem == MAP_FAILED)
