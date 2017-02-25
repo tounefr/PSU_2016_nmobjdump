@@ -26,7 +26,9 @@ static void    replace_spaces(void *ptr, int size) {
     }
 }
 
-static void    init_static_file_header(t_static_file_header *static_file_header) {
+static void    init_static_file_header(
+        t_static_file_header *static_file_header)
+{
     int i;
 
     i = 0;
@@ -44,12 +46,17 @@ char handle_static_library(t_elf_file *file) {
     if (!is_static_library(file))
         return 0;
     if (sizeof(t_static_file_header) >= file->file_infos.st_size)
-        MY_ERROR(-1, "%s: %s: File truncated\n", file->file_path, file->bin_path);
+        MY_ERROR(-1, "%s: %s: File truncated\n",
+                 file->file_path, file->bin_path);
 
-    memcpy(&static_file_header, (char*)file->mapped_mem + strlen(AR_MAGIC_NBR) + 1, sizeof(t_static_file_header));
+    memcpy(&static_file_header,
+           (char*)file->mapped_mem + strlen(AR_MAGIC_NBR) + 1,
+           sizeof(t_static_file_header));
     init_static_file_header(&static_file_header);
 
-    if (static_file_header.end_chars[0] != 0x60 && static_file_header.end_chars[1] != 0x0a)
-        MY_ERROR(-1, "%s: %s: File truncated\n", file->file_path, file->bin_path);
+    if (static_file_header.end_chars[0] != 0x60 &&
+            static_file_header.end_chars[1] != 0x0a)
+        MY_ERROR(-1, "%s: %s: File truncated\n",
+                 file->file_path, file->bin_path);
     return 1;
 }
