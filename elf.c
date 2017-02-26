@@ -10,6 +10,7 @@
 
 #include <string.h>
 #include <assert.h>
+#include <unistd.h>
 #include "common.h"
 
 struct s_flags g_flags[N_FLAGS] = {
@@ -25,9 +26,36 @@ struct s_flags g_flags[N_FLAGS] = {
         {D_PAGED,      "D_PAGED"}
 };
 
-static char        set_flags(t_elf_file *file) {
-    int     i;
-    char    *section_name;
+static char     set_flags_sections(t_elf_file *file, Elf64_Shdr *section_hdr)
+{
+    int         i;
+    char        *section_name;
+    Elf64_Off   *offset;
+
+    i = 0;
+    while (i < file->elf_header->e_shnum) {
+        if (NULL == (section_hdr = get_section_header(file, i)))
+            return 0;
+        section_name = "";
+        offset = file->mapped_mem + section_hdr->sh_offset;
+        if ((unsigned long)offset % getpagesize() == 0)
+            file->flags |= D_PAGED;
+        if (section_hdr->sh_type == SHT_DYNSYM ||
+            section_hdr->sh_type == SHT_SYMTAB ||
+            section_hdr->sh_type == SHT_HASH)
+            file->flags |= HAS_SYSMS;
+        if (!strcmp(section_name, ".line") &&
+            section_hdr->sh_type == SHT_PROGBITS)
+            file->flags |= HAS_LINENO;
+        if (!strcmp(section_name, ".debug") &&
+            section_hdr->sh_type == SHT_PROGBITS)
+            file->flags |= HAS_DEBUG;
+        i++;
+    }
+    return 1;
+}
+
+static char    set_flags(t_elf_file *file) {
     Elf64_Shdr *section_hdr;
 
     file->flags = 0;
@@ -39,26 +67,8 @@ static char        set_flags(t_elf_file *file) {
         file->flags |= EXEC_P;
     else if (file->elf_header->e_type == ET_CORE)
         file->flags |= HAS_DEBUG;
-    i = 0;
-    while (i < file->elf_header->e_shnum) {
-        if (NULL == (section_hdr = get_section_header(file, i)))
-            return 0;
-        section_name = "";
-        if (section_hdr->sh_type == SHT_DYNAMIC)
-            file->flags |= D_PAGED;
-        if (section_hdr->sh_type == SHT_DYNSYM ||
-                section_hdr->sh_type == SHT_SYMTAB ||
-                section_hdr->sh_type == SHT_HASH)
-            file->flags |= HAS_SYSMS;
-        //TODO: fix that shit
-        if (!strcmp(section_name, ".line") &&
-                section_hdr->sh_type == SHT_PROGBITS)
-            file->flags |= HAS_LINENO;
-        if (!strcmp(section_name, ".debug") &&
-                section_hdr->sh_type == SHT_PROGBITS)
-            file->flags |= HAS_DEBUG;
-        i++;
-    }
+    if (!set_flags_sections(file, section_hdr))
+        return 0;
     return 1;
 }
 
@@ -87,7 +97,9 @@ char                handle_elf_file(t_elf_file *file) {
                  file->bin_path, file->file_path);
     file->is_32bits = (common_elf->e_indent[EI_CLASS] == ELFCLASS32);
     if (!get_elf_header(file) || !get_program_header(file))
-        MY_ERROR(0, "%s: %s: File truncated\n", file->bin_path, file->file_path);
-    set_flags(file);
+        MY_ERROR(0, "%s: %s: File truncated\n",
+                 file->bin_path, file->file_path);
+    if (!set_flags(file))
+        return 0;
     return 1;
 }

@@ -34,7 +34,7 @@ void            fill_elf_header(Elf64_Ehdr *dest, Elf32_Ehdr *src) {
     dest->e_shstrndx = src->e_shstrndx;
 }
 
-void            fill_elf_program_header(Elf64_Phdr *dest, Elf32_Phdr *src) {
+void fill_elf_program_header(Elf64_Phdr *dest, Elf32_Phdr *src) {
     dest->p_type = src->p_type;
     dest->p_flags = src->p_flags;
     dest->p_offset = src->p_offset;
@@ -58,7 +58,8 @@ void fill_elf_section_header(Elf64_Shdr *dest, Elf32_Shdr *src) {
     dest->sh_entsize = src->sh_entsize;
 }
 
-void fill_elf_sections(Elf64_Shdr *dest, Elf32_Shdr *src, unsigned int nbr) {
+void    fill_elf_sections(Elf64_Shdr *dest, Elf32_Shdr *src, unsigned int nbr)
+{
     int i;
 
     i = 0;
@@ -68,7 +69,8 @@ void fill_elf_sections(Elf64_Shdr *dest, Elf32_Shdr *src, unsigned int nbr) {
     }
 }
 
-void fill_symtabs(Elf64_Sym *dest, Elf32_Sym *src, unsigned int nbr) {
+void    fill_symtabs(Elf64_Sym *dest, Elf32_Sym *src, unsigned int nbr)
+{
     int i;
 
     i = 0;
@@ -76,7 +78,7 @@ void fill_symtabs(Elf64_Sym *dest, Elf32_Sym *src, unsigned int nbr) {
         dest[i].st_name = src[i].st_name;
         dest[i].st_info = src[i].st_info;
         dest[i].st_other = src[i].st_other;
-        dest[i].st_shndx = src[i].st_shndx  ;
+        dest[i].st_shndx = src[i].st_shndx;
         dest[i].st_value = src[i].st_value;
         dest[i].st_size = src[i].st_size;
         i++;

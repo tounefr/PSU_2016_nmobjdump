@@ -10,8 +10,8 @@
 
 #include "common.h"
 
-void *get_section_content(t_elf_file *file, unsigned int i) {
-    Elf64_Shdr *section_hdr;
+void            *get_section_content(t_elf_file *file, unsigned int i) {
+    Elf64_Shdr  *section_hdr;
 
     if (NULL == (section_hdr = get_section_header(file, i)))
         return NULL;
@@ -21,8 +21,8 @@ void *get_section_content(t_elf_file *file, unsigned int i) {
     return file->mapped_mem + section_hdr->sh_offset;
 }
 
-char *lookup_string(t_elf_file *file, unsigned int i) {
-    Elf64_Shdr *section_hdr;
+char            *lookup_string(t_elf_file *file, unsigned int i) {
+    Elf64_Shdr  *section_hdr;
 
     section_hdr = get_section_header(file, file->elf_header->e_shstrndx);
     if (NULL == section_hdr)

@@ -12,7 +12,7 @@
 #include <string.h>
 #include "common.h"
 
-static void            print_section_hexadecimal(
+static void     print_section_hexadecimal(
                                 void *section_content,
                                 unsigned int *offset,
                                 Elf64_Shdr *section_hdr) {
@@ -20,6 +20,7 @@ static void            print_section_hexadecimal(
     Elf64_Off   off;
     int         i;
     char        *format_printf;
+
     i = 0;
     off = section_hdr->sh_addr + *offset;
 
@@ -41,8 +42,8 @@ static void            print_section_hexadecimal(
 static void        print_section_printable(void *section_content,
                                     unsigned int *offset,
                                     Elf64_Shdr *section_hdr) {
-    char    cur_char;
-    int     i;
+    char           cur_char;
+    int            i;
 
     i = 0;
     while (i < 16) {
@@ -55,9 +56,11 @@ static void        print_section_printable(void *section_content,
     }
 }
 
-static char    check_print_section(t_elf_file *file, Elf64_Shdr *section_hdr) {
-    char *section_name;
-    Elf64_Shdr *section_str;
+static char     check_print_section(t_elf_file *file,
+                                    Elf64_Shdr *section_hdr)
+{
+    char        *section_name;
+    Elf64_Shdr  *section_str;
 
     if (NULL == (section_name = lookup_string(file, section_hdr->sh_name)))
         return 0;
@@ -67,42 +70,50 @@ static char    check_print_section(t_elf_file *file, Elf64_Shdr *section_hdr) {
         section_hdr->sh_type == SHT_NULL ||
         section_hdr->sh_size == 0)
         return 0;
-    if (section_hdr->sh_type != SHT_PROGBITS && file->elf_header->e_type == ET_REL)
+    if (section_hdr->sh_type != SHT_PROGBITS &&
+            file->elf_header->e_type == ET_REL)
         return 0;
-    if (section_hdr->sh_type == SHT_SYMTAB && file->elf_header->e_type == ET_DYN)
+    if (section_hdr->sh_type == SHT_SYMTAB &&
+            file->elf_header->e_type == ET_DYN)
         return 0;
-    if (!strcmp(section_name, ".strtab") &&  file->elf_header->e_type == ET_DYN)
+    if (!strcmp(section_name, ".strtab") &&
+            file->elf_header->e_type == ET_DYN)
         return 0;
     return 1;
+}
+
+void                print_section(char *section_name,
+                                  void *section_content,
+                                  Elf64_Shdr *section_hdr) {
+    unsigned int    offset;
+
+    printf("Contents of section %s:\n", section_name);
+    offset = 0;
+    while (offset < section_hdr->sh_size) {
+        print_section_hexadecimal(section_content,
+                                  &offset, section_hdr);
+        print_section_printable(section_content,
+                                &offset, section_hdr);
+        printf("\n");
+        offset += 16;
+    }
 }
 
 void                print_sections(t_elf_file *file) {
     int             i;
     char            *section_name;
     void            *section_content;
-    unsigned int    offset;
-    Elf64_Shdr *section_hdr;
+    Elf64_Shdr      *section_hdr;
 
     if (file->elf_header->e_shoff == 0 || file->elf_header->e_shnum == 0)
         return;
     i = 0;
     while (i < file->elf_header->e_shnum) {
-        if (NULL == (section_hdr = get_section_header(file, i)))
-            return;
-        if (NULL == (section_name = lookup_string(file, section_hdr->sh_name)))
-            return;
-        if (check_print_section(file, section_hdr)) {
-            if ((section_content = get_section_content(file, i))) {
-                printf("Contents of section %s:\n", section_name);
-                offset = 0;
-                while (offset < section_hdr->sh_size) {
-                    print_section_hexadecimal(section_content,
-                                              &offset, section_hdr);
-                    print_section_printable(section_content,
-                                            &offset, section_hdr);
-                    printf("\n");
-                    offset += 16;
-                }
+        section_hdr = get_section_header(file, i);
+        if (section_hdr && check_print_section(file, section_hdr)) {
+            section_name = lookup_string(file, section_hdr->sh_name);
+            if ((section_content = get_section_content(file, i - 1))) {
+                print_section(section_name, section_content, section_hdr);
             }
         }
         i++;

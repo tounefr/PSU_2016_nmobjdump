@@ -13,8 +13,8 @@
 
 static char	*remove_useless_zero(char *str)
 {
-  int	i;
-  char	*str_cleaned;
+  int	    i;
+  char	    *str_cleaned;
 
   i = 0;
   while (str[i] == '0')

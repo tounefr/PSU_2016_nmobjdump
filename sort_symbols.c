@@ -12,9 +12,11 @@
 #include <string.h>
 #include "common.h"
 
-char symbols_list_push(t_sorted_symbols **head, Elf64_Sym *elem) {
-    t_sorted_symbols *new_sorted_sym;
-    t_sorted_symbols *last;
+char                    symbols_list_push(t_sorted_symbols **head,
+                                          Elf64_Sym *elem)
+{
+    t_sorted_symbols    *new_sorted_sym;
+    t_sorted_symbols    *last;
 
     if (NULL == (new_sorted_sym = malloc(sizeof(t_sorted_symbols))))
         return 0;
@@ -44,16 +46,22 @@ char symbols_list_push_syms(t_sorted_symbols **sorted_symbols,
     return 1;
 }
 
-t_sorted_symbols *sort_symbols(t_elf_file *file,
+static void     swap_ptrs(void **ptr1, void **ptr2) {
+    void        *tmp;
+
+    tmp = *ptr1;
+    *ptr1 = *ptr2;
+    *ptr2 = tmp;
+}
+
+t_sorted_symbols        *sort_symbols(t_elf_file *file,
                                Elf64_Shdr *section_hdr,
                                Elf64_Sym *sym_tabs,
                                int nbr_syms) {
-    t_sorted_symbols *sorted_symbols;
-    t_sorted_symbols *cur;
-    char sorted;
-    char *name_sym1;
-    char *name_sym2;
-    Elf64_Sym *sym_tmp;
+    t_sorted_symbols    *sorted_symbols;
+    t_sorted_symbols    *cur;
+    char                sorted;
+    char                *names[2];
 
     sorted_symbols = NULL;
     symbols_list_push_syms(&sorted_symbols, sym_tabs, nbr_syms);
@@ -62,13 +70,12 @@ t_sorted_symbols *sort_symbols(t_elf_file *file,
         sorted = 1;
         cur = sorted_symbols;
         while (cur && cur->next) {
-            name_sym1 = lookup_string_symbol(file, section_hdr, cur->symbol);
-            name_sym2 = lookup_string_symbol(file, section_hdr, cur->next->symbol);
-            if (strcmp(name_sym2, name_sym1) < 0) {
+            names[0] = lookup_string_symbol(file, section_hdr, cur->symbol);
+            names[1] = lookup_string_symbol(file,
+                                            section_hdr, cur->next->symbol);
+            if (strcmp(names[1], names[0]) < 0) {
                 sorted = 0;
-                sym_tmp = cur->symbol;
-                cur->symbol = cur->next->symbol;
-                cur->next->symbol = sym_tmp;
+                swap_ptrs((void**)&cur->symbol, (void**)&cur->next->symbol);
             }
             cur = cur->next;
         }

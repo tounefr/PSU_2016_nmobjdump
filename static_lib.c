@@ -18,7 +18,7 @@ static char is_static_library(t_elf_file *file) {
 static void    init_static_file_header(
         t_static_file_header *static_file_header)
 {
-    int i;
+    int         i;
 
     i = 0;
     while (i < sizeof(t_static_file_header)) {

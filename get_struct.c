@@ -28,9 +28,9 @@ Elf64_Ehdr *get_elf_header(t_elf_file *file) {
     return file->elf_header;
 }
 
-Elf64_Phdr *get_program_header(t_elf_file *file) {
-    Elf64_Ehdr *elf_header;
-    void *program_header;
+Elf64_Phdr      *get_program_header(t_elf_file *file) {
+    Elf64_Ehdr  *elf_header;
+    void        *program_header;
 
     if (file->elf_program_header)
         return file->elf_program_header;
@@ -51,9 +51,9 @@ Elf64_Phdr *get_program_header(t_elf_file *file) {
     return file->elf_program_header;
 }
 
-char sections_hdr_to_64bits(t_elf_file *file) {
-    Elf64_Ehdr *elf_header;
-    Elf32_Shdr *elf_sections;
+char            sections_hdr_to_64bits(t_elf_file *file) {
+    Elf64_Ehdr  *elf_header;
+    Elf32_Shdr  *elf_sections;
 
     if (NULL == (elf_header = get_elf_header(file)))
         return 0;
@@ -69,8 +69,8 @@ char sections_hdr_to_64bits(t_elf_file *file) {
     return 1;
 }
 
-Elf64_Shdr *get_section_header(t_elf_file *file, unsigned int i) {
-    Elf64_Ehdr *elf_header;
+Elf64_Shdr      *get_section_header(t_elf_file *file, unsigned int i) {
+    Elf64_Ehdr  *elf_header;
 
     if (NULL == (elf_header = get_elf_header(file)))
         return NULL;
@@ -83,11 +83,11 @@ Elf64_Shdr *get_section_header(t_elf_file *file, unsigned int i) {
     return &file->elf_sections[i];
 }
 
-Elf64_Sym *get_symbols(t_elf_file *file,
+Elf64_Sym       *get_symbols(t_elf_file *file,
                        Elf64_Shdr *section_hdr,
                        int *nbr_symbols) {
-    Elf64_Sym *symtabs_64;
-    Elf32_Sym *symtabs_32;
+    Elf64_Sym   *symtabs_64;
+    Elf32_Sym   *symtabs_32;
 
     *nbr_symbols = section_hdr->sh_size / section_hdr->sh_entsize;
     if (!file->is_32bits)

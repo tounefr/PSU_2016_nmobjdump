@@ -30,11 +30,11 @@ long	my_pow(long nb, int power)
         return (nb);
 }
 
-char *str_concat(char *str1, char *str2) {
-    int len1;
-    int len2;
-    int i;
-    char *dest;
+char        *str_concat(char *str1, char *str2) {
+    int     len1;
+    int     len2;
+    int     i;
+    char    *dest;
 
     len1 = strlen(str1);
     len2 = strlen(str2);
